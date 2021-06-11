@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  adonis-api:
+    build:
+      context: .
+      dockerfile: docker/adonis.dockerfile
+    container_name: ${APP_NAME}-api
+    command: npm run dev
+    ports:
+      - "${PORT}:${PORT}"
+    # expose:
+    #   - "3333"
+    volumes:
+      - ./backend:/var/app
+      - ./.env:/var/app/.env
+      - /var/app/node_modules
+    environment:
+      - TZ=Asia/Bangkok
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: mysql:8.0.25
+    container_name: ${APP_NAME}-mysql
+    volumes:
+        - ./data-mysql:/var/lib/mysql
+    environment:
+        MYSQL_DATABASE: ${DB_DATABASE}
+        MYSQL_USER: ${DB_USER}
+        MYSQL_PASSWORD: ${DB_PASSWORD}
+        MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    ports:
+      - "${DB_PORT}:3306"
+
+  redis:
+    image: redis:6.2
+    container_name: ${APP_NAME}-redis
+    ports:
+      - "${REDIS_PORT}:6379"
