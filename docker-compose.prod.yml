@@ -4,18 +4,15 @@ services:
   adonis-api:
     build:
       context: .
-      dockerfile: docker/adonis.dockerfile
-    container_name: ${APP_NAME}-api-dev
+      dockerfile: docker/adonis-prod.dockerfile
+    container_name: ${APP_NAME}-api
     hostname: ${APP_NAME}
-    command: npm run dev
+    command: npm run pm2-docker
+    volumes:
+      - ./.env:/var/app/.env
+      - ./logs/:/var/app/logs/
     ports:
       - '${PORT}:${PORT}'
-    # expose:
-    #   - "3333"
-    volumes:
-      - ./backend:/var/app
-      - ./.env:/var/app/.env
-      - /var/app/node_modules
     environment:
       - TZ=Asia/Bangkok
     depends_on:
@@ -24,7 +21,7 @@ services:
 
   db:
     image: mysql:5.7
-    container_name: ${APP_NAME}-mysql-dev
+    container_name: ${APP_NAME}-mysql
     volumes:
       - ./data-mysql:/var/lib/mysql
     environment:
@@ -40,6 +37,6 @@ services:
 
   redis:
     image: redis:6.2
-    container_name: ${APP_NAME}-redis-dev
+    container_name: ${APP_NAME}-redis
     ports:
       - '${REDIS_PORT_FOR_DOCKER}:6379'
